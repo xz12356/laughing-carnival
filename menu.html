@@ -185,7 +185,6 @@
             margin: 10px 0;
         }
 
-        /* 动画 */
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -208,7 +207,6 @@
             }
         }
 
-        /* 响应式设计 */
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 36px;
@@ -251,49 +249,14 @@
 <body>
 
 <div class="container">
-    <!-- 页头 -->
     <div class="header">
         <h1>《阿房宫赋》互动游戏中心</h1>
         <p>🏛️ 古文学习，趣味闯关 🏛️</p>
         <p class="tagline">从杜牧的经典著作中，体验中华文学的魅力</p>
     </div>
 
-    <!-- 游戏卡片 -->
     <div class="games-grid">
-        <!-- 游戏1：逻辑拼图 -->
-        <div class="game-card">
-            <div class="game-header">
-                <div class="game-icon">🧩</div>
-                <div class="game-title">逻辑拼图</div>
-                <div class="game-subtitle">思维导图重构</div>
-            </div>
-            <div class="game-content">
-                <div class="game-description">
-                    通过拖拽词语卡片，完成《阿房宫赋》的结构思维导图，深化对古文逻辑框架的理解。
-                </div>
-                <div class="game-features">
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span>
-                        <span>互动拖拽式游戏，趣味十足</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span>
-                        <span>完整的文章结构分析</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span>
-                        <span>支持手机和电脑</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span>
-                        <span>实时反馈和指导</span>
-                    </div>
-                </div>
-                <a href="index.html" class="play-btn">开始挑战 →</a>
-            </div>
-        </div>
-
-        <!-- 游戏2：字词闯关 -->
+        <!-- 游戏1：字词闯关 -->
         <div class="game-card">
             <div class="game-header">
                 <div class="game-icon">📝</div>
@@ -325,11 +288,43 @@
                 <a href="efang-quiz.html" class="play-btn">开始答题 →</a>
             </div>
         </div>
+
+        <!-- 游戏2：逻辑拼图 -->
+        <div class="game-card">
+            <div class="game-header">
+                <div class="game-icon">🧩</div>
+                <div class="game-title">逻辑拼图</div>
+                <div class="game-subtitle">思维导图重构</div>
+            </div>
+            <div class="game-content">
+                <div class="game-description">
+                    通过拖拽词语卡片，完成《阿房宫赋》的结构思维导图，深化对古文逻辑框架的理解。
+                </div>
+                <div class="game-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>互动拖拽式游戏，趣味十足</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>完整的文章结构分析</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>支持手机和电脑</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>实时反馈和指导</span>
+                    </div>
+                </div>
+                <a href="index.html" class="play-btn">开始挑战 →</a>
+            </div>
+        </div>
     </div>
 
-    <!-- 页脚 -->
     <div class="footer">
-        <div class="footer-text">💡 提示：建议先完成逻辑拼图游戏，再进行字词闯关，学习效果更佳</div>
+        <div class="footer-text">💡 提示：建议先完成字词闯关游戏，再进行逻辑拼图，学习效果更佳</div>
         <div class="footer-text">🎯 两个游戏都完成？恭喜你已成为《阿房宫赋》小专家！</div>
         <div class="footer-text" style="margin-top: 20px; font-size: 12px; color: #ccc;">
             © 2026 欢笑嘉年华 | 古文学习互动平台
