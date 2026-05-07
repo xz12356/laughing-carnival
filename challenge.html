@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿房宫赋三阶通关挑战</title>
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --bg-color: #f4f1ea;
+            --accent-color: #d35400;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "KaiTi", "STKaiti", "Microsoft YaHei", serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(#e0dcd3 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #fff;
+            border: 4px double var(--primary-color);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 32px;
+            letter-spacing: 2px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+
+        .option-btn:hover {
+            background: #fdf5e6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .option-btn.correct {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        .option-btn.wrong {
+            background: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border: 3px solid var(--primary-color);
+            animation: popIn 0.3s ease;
+        }
+
+        .modal h2 { margin-top: 0; }
+        .modal p { font-size: 18px; line-height: 1.5; }
+        
+        .next-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .next-btn:hover { background: #6d360e; }
+
+        .result-screen {
+            text-align: center;
+            display: none;
+        }
+        .result-screen h2 { font-size: 36px; color: var(--accent-color); }
+        .score { font-size: 48px; color: var(--primary-color); margin: 20px 0; }
+
+        .nav-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: #999;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        .nav-btn:hover { background: #777; }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+            .option-btn { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>阿房宫赋通关挑战</h1>
+        <div id="levelDisplay" class="level-badge">第一阶：基础层</div>
+    </div>
+
+    <div class="progress-container">
+        <div id="progressBar" class="progress-bar"></div>
+    </div>
+
+    <div id="gameArea">
+        <div id="questionText" class="question-box">题目加载中...</div>
+        <div id="optionsContainer" class="options-grid"></div>
+    </div>
+
+    <div id="resultArea" class="result-screen">
+        <h2>挑战完成</h2>
+        <p>你的最终得分是：</p>
+        <div class="score" id="finalScore">0</div>
+        <p id="resultComment">评价加载中...</p>
+        <button class="next-btn" onclick="location.reload()">再玩一次</button>
+        <div class="nav-buttons">
+            <a href="menu.html" class="nav-btn">返回主菜单</a>
+            <a href="efang-quiz.html" class="nav-btn">字词闯关</a>
+            <a href="index.html" class="nav-btn">逻辑拼图</a>
+        </div>
+    </div>
+</div>
+
+<div id="feedbackModal" class="modal-overlay">
+    <div class="modal">
+        <h2 id="modalTitle">回答正确</h2>
+        <p id="modalContent">解析内容...</p>
+        <button class="next-btn" onclick="nextQuestion()">下一题</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            level: "基础层",
+            question: "在六王毕四海一中,一字的用法是什么",
+            options: ["数词作动词统一", "形容词专一", "数词一个", "动词统一度量衡"],
+            answer: 0,
+            feedback: "正确!一在这里是数词作动词,意为统一。"
+        },
+        {
+            level: "基础层",
+            question: "戍卒叫函谷举属于哪种特殊文言句式",
+            options: ["判断句", "被动句", "倒装句", "省略句"],
+            answer: 1,
+            feedback: "正确!这是被动句,举意为被攻占。"
+        },
+        {
+            level: "基础层",
+            question: "鼎铛玉石金块珠砾体现了秦人怎样的心理",
+            options: ["勤俭节约", "极度轻视与挥霍", "喜爱收藏", "崇尚自然"],
+            answer: 1,
+            feedback: "正确!将宝鼎看作铁锅,美玉看作石头,体现了秦统治者对珍宝的极度轻视。"
+        },
+        {
+            level: "提高层",
+            question: "歌台暖响风雨凄凄运用了什么修辞手法",
+            options: ["比喻与拟人", "夸张与对比", "排比与反复", "借代与双关"],
+            answer: 1,
+            feedback: "正确!运用夸张与对比,极言阿房宫内歌舞之盛。"
+        },
+        {
+            level: "提高层",
+            question: "廊腰缦回檐牙高啄中缦和啄字好在哪里",
+            options: ["描绘了声音的悦耳", "运用了拟人形象生动", "描绘了颜色的鲜艳", "说明了建筑的坚固"],
+            answer: 1,
+            feedback: "正确!缦写走廊萦绕,啄运用拟人写屋檐尖耸,形象生动。"
+        },
+        {
+            level: "提高层",
+            question: "文中连用六个多于构成排比有何作用",
+            options: ["增强气势揭露掠夺", "说明阿房宫面积大", "展示秦朝人口众多", "描写景色的优美"],
+            answer: 0,
+            feedback: "正确!通过强烈对比,揭露秦统治者掠夺民财骄奢淫逸的罪行。"
+        },
+        {
+            level: "拓展层",
+            question: "后人哀之而不鉴之中杜牧警示当朝统治者什么",
+            options: ["要加强军事防御", "要学习秦朝法律", "若不以史为鉴必重蹈覆辙", "要修建更宏伟的宫殿"],
+            answer: 2,
+            feedback: "正确!作者借此警示晚唐统治者,若不吸取秦亡教训,必将重蹈覆辙。"
+        },
+        {
+            level: "拓展层",
+            question: "灭六国者六国也体现了作者什么观点",
+            options: ["秦国的军事强大", "六国的地理位置不好", "民心向背决定兴亡", "历史是偶然发生的"],
+            answer: 2,
+            feedback: "正确!体现了民心向背决定兴亡的观点,六国灭亡是因为不爱惜百姓。"
+        },
+        {
+            level: "拓展层",
+            question: "阿房宫赋结尾卒章显志的核心主旨是",
+            options: ["赞美建筑艺术", "借古讽今忧国忧民", "记录历史事实", "感叹时光流逝"],
+            answer: 1,
+            feedback: "正确!文章由描写转入议论,点明借古讽今主旨,体现忧国忧民情怀。"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    const scorePerQuestion = 100 / questions.length;
+
+    function initGame() {
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestionIndex];
+        
+        document.getElementById('levelDisplay').innerText = q.level;
+        document.getElementById('questionText').innerText = (currentQuestionIndex + 1) + ". " + q.question;
+        
+        const progress = ((currentQuestionIndex) / questions.length) * 100;
+        document.getElementById('progressBar').style.width = progress + "%";
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+        
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        const q = questions[currentQuestionIndex];
+        const modal = document.getElementById('feedbackModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+
+        if (selectedIndex === q.answer) {
+            btnElement.classList.add('correct');
+            score += scorePerQuestion;
+            modalTitle.innerText = "正确";
+            modalTitle.style.color = "var(--success-color)";
+        } else {
+            btnElement.classList.add('wrong');
+            buttons[q.answer].classList.add('correct');
+            modalTitle.innerText = "错误";
+            modalTitle.style.color = "var(--error-color)";
+        }
+
+        modalContent.innerText = q.feedback;
+        
+        setTimeout(() => {
+            modal.style.display = 'flex';
+        }, 300);
+    }
+
+    function nextQuestion() {
+        document.getElementById('feedbackModal').style.display = 'none';
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('levelDisplay').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+        document.getElementById('progressBar').style.width = "100%";
+        
+        const finalScore = Math.round(score);
+        document.getElementById('finalScore').innerText = finalScore;
+
+        let comment = "";
+        if (finalScore === 100) comment = "太棒了!你对阿房宫赋的理解已经炉火纯青!🏆";
+        else if (finalScore >= 80) comment = "非常优秀!基础扎实,继续保持!🥇";
+        else if (finalScore >= 60) comment = "及格了,但还有进步空间,复习一下再来挑战吧!🥈";
+        else comment = "加油!建议重读课文,特别是课下注释哦!📚";
+        
+        document.getElementById('resultComment').innerText = comment;
+    }
+
+    initGame();
+</script>
+
+</body>
+</html>
