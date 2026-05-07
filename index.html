@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>《阿房宫赋》逻辑拼图·互动游戏</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f1ea;
+            font-family: "KaiTi", "STKaiti", "Microsoft YaHei", sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none; /* 防止手机端滑动屏幕 */
+        }
+
+        header {
+            background: #8B4513;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .game-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 50px);
+            overflow: hidden;
+        }
+
+        /* 左侧：思维导图区域 */
+        .map-area {
+            flex: 6;
+            background: #fff;
+            padding: 10px;
+            position: relative;
+            overflow: auto;
+            border-right: 3px dashed #ccc;
+        }
+
+        /* 右侧：词语卡片库 */
+        .card-area {
+            flex: 4;
+            background: #fdf5e6;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+            border-left: 1px solid #ddd;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8B4513;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #8B4513;
+            padding-bottom: 5px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 节点样式 */
+        .node {
+            position: absolute;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+            min-width: 60px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .skeleton {
+            border: 2px dashed #999;
+            background: #f9f9f9;
+            color: #999;
+            font-weight: bold;
+        }
+
+        .filled {
+            border: 2px solid #4CAF50;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+            transform: scale(1.05);
+        }
+
+        .fixed-hint {
+            border: 1px solid #ddd;
+            background: #f0f0f0;
+            color: #555;
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
+        .main-title {
+            font-size: 22px;
+            background: #8B4513;
+            color: white;
+            border: none;
+            font-weight: bold;
+            padding: 8px 15px;
+        }
+
+        /* 右侧卡片样式 */
+        .word-card {
+            width: 90px;
+            padding: 8px 4px;
+            margin: 6px;
+            background: #ffeb3b;
+            border: 1px solid #fbc02d;
+            border-radius: 5px;
+            text-align: center;
+            cursor: grab;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+            user-select: none;
+            touch-action: none; /* 关键：允许JS接管触摸事件 */
+            position: relative;
+            z-index: 1;
+        }
+
+        .word-card.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        #message-box {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: none;
+            z-index: 2000;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* 手机端适配 */
+        @media (max-width: 768px) {
+            .game-container { flex-direction: column; }
+            .map-area { flex: 7; border-right: none; border-bottom: 3px dashed #ccc; }
+            .card-area { flex: 3; flex-direction: row; flex-wrap: wrap; align-content: flex-start; }
+            .card-title { display: none; } /* 手机端隐藏标题节省空间 */
+            .word-card { width: 70px; font-size: 12px; padding: 6px 2px; margin: 4px; }
+            .node { font-size: 12px; padding: 4px 6px; min-width: 50px; }
+            .main-title { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>《阿房宫赋》逻辑重构·互动拼图</header>
+
+<div class="game-container">
+    <!-- 左侧思维导图区 -->
+    <div class="map-area" id="mapArea">
+        <div class="node main-title" style="top: 10px; left: 35%;">阿房宫赋</div>
+
+        <!-- 第一层 -->
+        <div class="node skeleton" data-id="part1" style="top: 80px; left: 15%;"></div>
+        <div class="node fixed-hint" style="top: 80px; left: 30%;">体物</div>
+        <div class="node skeleton" data-id="part2" style="top: 80px; left: 55%;"></div>
+        <div class="node fixed-hint" style="top: 80px; left: 70%;">言志</div>
+
+        <!-- 描写分支 -->
+        <div class="node skeleton" data-id="desc1" style="top: 140px; left: 5%;">(外观)</div>
+        <div class="node skeleton" data-id="sub1" style="top: 190px; left: 2%;"></div>
+        <div class="node skeleton" data-id="sub2" style="top: 190px; left: 12%;"></div>
+        
+        <div class="node skeleton" data-id="desc2" style="top: 140px; left: 22%;">(内部)</div>
+        <div class="node skeleton" data-id="sub3" style="top: 190px; left: 18%;"></div>
+        <div class="node skeleton" data-id="sub4" style="top: 190px; left: 28%;"></div>
+        <div class="node fixed-hint" style="top: 140px; left: 35%; color:#8B4513;">铺采摛文</div>
+
+        <!-- 议论分支 -->
+        <div class="node skeleton" data-id="reason" style="top: 140px; left: 50%;">(秦亡原因)</div>
+        <div class="node skeleton" data-id="sub5" style="top: 190px; left: 48%;"></div>
+        <div class="node skeleton" data-id="sub6" style="top: 190px; left: 60%;"></div>
+
+        <div class="node skeleton" data-id="goal" style="top: 140px; left: 72%;">(写作目的)</div>
+        <div class="node skeleton" data-id="sub7" style="top: 190px; left: 68%;"></div>
+        <div class="node skeleton" data-id="sub8" style="top: 190px; left: 80%;"></div>
+
+        <!-- 底部主旨 -->
+        <div class="node skeleton" data-id="logic1" style="top: 260px; left: 35%; background:#ffe0b2; border-color:#ff9800;"></div>
+        <div style="position:absolute; top:268px; left:48%; font-size:18px; color:#999;">➡</div>
+        <div class="node skeleton" data-id="logic2" style="top: 260px; left: 50%; background:#ffe0b2; border-color:#ff9800;"></div>
+    </div>
+
+    <!-- 右侧词语卡片库 -->
+    <div class="card-area">
+        <div class="card-title">词语卡片库</div>
+        <div id="cardsContainer" style="display: flex; flex-wrap: wrap; justify-content: center; width: 100%;">
+            <!-- 卡片由JS生成 -->
+        </div>
+    </div>
+</div>
+
+<div id="message-box"></div>
+
+<script>
+    const wordData = [
+        { id: 'part1', text: '描写' }, { id: 'part2', text: '议论' },
+        { id: 'desc1', text: '雄伟壮观' }, { id: 'sub1', text: '占地之广' },
+        { id: 'sub2', text: '楼阁之高' }, { id: 'desc2', text: '宫内生活' },
+        { id: 'sub3', text: '美人之多' }, { id: 'sub4', text: '珍宝之富' },
+        { id: 'reason', text: '秦亡原因' }, { id: 'sub5', text: '秦皇奢欲' },
+        { id: 'sub6', text: '宫化焦土' }, { id: 'goal', text: '写作目的' },
+        { id: 'sub7', text: '总结教训' }, { id: 'sub8', text: '警戒爱民' },
+        { id: 'logic1', text: '借古' }, { id: 'logic2', text: '讽今' }
+    ];
+
+    const cardsContainer = document.getElementById('cardsContainer');
+    const messageBox = document.getElementById('message-box');
+    let draggedCard = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+    let originalPosition = { left: 0, top: 0 };
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function initCards() {
+        const shuffledData = [...wordData];
+        shuffle(shuffledData);
+        cardsContainer.innerHTML = '';
+
+        shuffledData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'word-card';
+            card.innerText = item.text;
+            card.dataset.id = item.id;
+
+            // 电脑端鼠标拖拽
+            card.setAttribute('draggable', true);
+            card.addEventListener('dragstart', function() {
+                draggedCard = this;
+                setTimeout(() => this.style.opacity = '0.5', 0);
+            });
+            card.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+                draggedCard = null;
+            });
+
+            // 手机端触摸拖拽
+            card.addEventListener('touchstart', handleTouchStart, { passive: false });
+            card.addEventListener('touchmove', handleTouchMove, { passive: false });
+            card.addEventListener('touchend', handleTouchEnd);
+
+            cardsContainer.appendChild(card);
+        });
+    }
+
+    // 手机触摸事件处理
+    function handleTouchStart(e) {
+        e.preventDefault();
+        draggedCard = this;
+        const touch = e.touches[0];
+        const rect = this.getBoundingClientRect();
+        touchOffsetX = touch.clientX - rect.left;
+        touchOffsetY = touch.clientY - rect.top;
+        
+        this.classList.add('dragging');
+        this.style.position = 'fixed';
+        this.style.left = rect.left + 'px';
+        this.style.top = rect.top + 'px';
+        this.style.width = rect.width + 'px';
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault();
+        if (!draggedCard) return;
+        const touch = e.touches[0];
+        draggedCard.style.left = (touch.clientX - touchOffsetX) + 'px';
+        draggedCard.style.top = (touch.clientY - touchOffsetY) + 'px';
+    }
+
+    function handleTouchEnd(e) {
+        if (!draggedCard) return;
+        const touch = e.changedTouches[0];
+        draggedCard.classList.remove('dragging');
+        
+        // 检查是否落在目标区域
+        const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+        const dropZone = targetElement ? targetElement.closest('.skeleton') : null;
+
+        if (dropZone) {
+            const targetId = dropZone.dataset.id;
+            const cardId = draggedCard.dataset.id;
+            if (targetId === cardId) {
+                dropZone.classList.remove('skeleton');
+                dropZone.classList.add('filled');
+                dropZone.innerText = draggedCard.innerText;
+                draggedCard.remove();
+                showMessage("✅ 回答正确！");
+            } else {
+                resetCardStyle(draggedCard);
+                showMessage("❌ 位置不对哦！");
+            }
+        } else {
+            resetCardStyle(draggedCard);
+        }
+        draggedCard = null;
+    }
+
+    function resetCardStyle(card) {
+        card.style.position = 'relative';
+        card.style.left = 'auto';
+        card.style.top = 'auto';
+        card.style.width = 'auto';
+    }
+
+    // 电脑端放置逻辑
+    document.querySelectorAll('.skeleton').forEach(node => {
+        node.addEventListener('dragover', e => e.preventDefault());
+        node.addEventListener('drop', function(e) {
+            e.preventDefault();
+            if (!draggedCard) return;
+            const targetId = this.dataset.id;
+            const cardId = draggedCard.dataset.id;
+
+            if (targetId === cardId) {
+                this.classList.remove('skeleton');
+                this.classList.add('filled');
+                this.innerText = draggedCard.innerText;
+                draggedCard.remove();
+                showMessage("✅ 回答正确！");
+            } else {
+                showMessage("❌ 位置不对哦！");
+            }
+        });
+    });
+
+    function showMessage(text) {
+        messageBox.innerText = text;
+        messageBox.style.display = 'block';
+        setTimeout(() => { messageBox.style.display = 'none'; }, 1500);
+    }
+
+    initCards();
+</script>
+</body>
+</html>
