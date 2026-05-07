@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>《阿房宫赋》互动游戏中心</title>
+    <style>
+        :root {
+            --primary-color: #8B4513;
+            --secondary-color: #D2B48C;
+            --bg-color: #FDF5E6;
+            --text-color: #333;
+            --accent-color: #F4A460;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "KaiTi", sans-serif;
+            background: linear-gradient(135deg, #FDF5E6 0%, #E8DCC8 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        .tagline {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .game-card:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .game-card:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(139, 69, 19, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .game-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .game-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .game-content {
+            padding: 25px;
+        }
+
+        .game-description {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .game-features {
+            background-color: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .feature-item {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-icon {
+            color: var(--accent-color);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .play-btn:active {
+            transform: scale(0.98);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid var(--secondary-color);
+            color: #999;
+            font-size: 14px;
+        }
+
+        .footer-text {
+            margin: 10px 0;
+        }
+
+        /* 动画 */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .game-header {
+                padding: 20px;
+            }
+
+            .game-icon {
+                font-size: 40px;
+            }
+
+            .game-title {
+                font-size: 20px;
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 页头 -->
+    <div class="header">
+        <h1>《阿房宫赋》互动游戏中心</h1>
+        <p>🏛️ 古文学习，趣味闯关 🏛️</p>
+        <p class="tagline">从杜牧的经典著作中，体验中华文学的魅力</p>
+    </div>
+
+    <!-- 游戏卡片 -->
+    <div class="games-grid">
+        <!-- 游戏1：逻辑拼图 -->
+        <div class="game-card">
+            <div class="game-header">
+                <div class="game-icon">🧩</div>
+                <div class="game-title">逻辑拼图</div>
+                <div class="game-subtitle">思维导图重构</div>
+            </div>
+            <div class="game-content">
+                <div class="game-description">
+                    通过拖拽词语卡片，完成《阿房宫赋》的结构思维导图，深化对古文逻辑框架的理解。
+                </div>
+                <div class="game-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>互动拖拽式游戏，趣味十足</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>完整的文章结构分析</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>支持手机和电脑</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>实时反馈和指导</span>
+                    </div>
+                </div>
+                <a href="index.html" class="play-btn">开始挑战 →</a>
+            </div>
+        </div>
+
+        <!-- 游戏2：字词闯关 -->
+        <div class="game-card">
+            <div class="game-header">
+                <div class="game-icon">📝</div>
+                <div class="game-title">字词闯关</div>
+                <div class="game-subtitle">课堂检测卷 <span class="badge">10题</span></div>
+            </div>
+            <div class="game-content">
+                <div class="game-description">
+                    挑战10道精心设计的文言字词题，涵盖读音、词义、古今异义等多个维度，全面检测你的学习成果。
+                </div>
+                <div class="game-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>10道精选题目，循序渐进</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>详细讲解和解析</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>实时评分和反馈</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span>
+                        <span>获得荣誉称号</span>
+                    </div>
+                </div>
+                <a href="efang-quiz.html" class="play-btn">开始答题 →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        <div class="footer-text">💡 提示：建议先完成逻辑拼图游戏，再进行字词闯关，学习效果更佳</div>
+        <div class="footer-text">🎯 两个游戏都完成？恭喜你已成为《阿房宫赋》小专家！</div>
+        <div class="footer-text" style="margin-top: 20px; font-size: 12px; color: #ccc;">
+            © 2026 欢笑嘉年华 | 古文学习互动平台
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
