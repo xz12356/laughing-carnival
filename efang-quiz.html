@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>《阿房宫赋》字词闯关·课堂检测</title>
+    <style>
+        :root {
+            --primary-color: #8B4513; /* 古风棕色 */
+            --secondary-color: #D2B48C; /* 浅棕色 */
+            --bg-color: #FDF5E6; /* 米色背景 */
+            --text-color: #333;
+            --correct-color: #4CAF50;
+            --wrong-color: #F44336;
+        }
+
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #eee;
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--correct-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-body {
+            padding: 30px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid var(--secondary-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: var(--bg-color);
+            border-color: var(--primary-color);
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-color);
+            color: white;
+            border-color: var(--correct-color);
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-color);
+            color: white;
+            border-color: var(--wrong-color);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border-left: 5px solid #ccc;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            border-left-color: var(--correct-color);
+            background-color: #e8f5e9;
+        }
+
+        .feedback.wrong {
+            border-left-color: var(--wrong-color);
+            background-color: #ffebee;
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .next-btn:hover {
+            opacity: 0.9;
+        }
+
+        .result-screen {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .score {
+            font-size: 48px;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .badge {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .restart-btn {
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .home-btn {
+            padding: 12px 30px;
+            background-color: #999;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>阿房宫赋·字词闯关</h1>
+        <div style="font-size: 14px; margin-top: 5px;">课堂检测卷</div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <!-- 答题区域 -->
+    <div class="quiz-body" id="quiz-area">
+        <div class="question-text" id="question">题目加载中...</div>
+        <div class="options" id="options">
+            <!-- 选项将通过JS插入 -->
+        </div>
+        <div class="feedback" id="feedback">
+            <strong id="feedback-title"></strong>
+            <p id="feedback-text"></p>
+        </div>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题</button>
+    </div>
+
+    <!-- 结果区域 -->
+    <div class="result-screen" id="result-area">
+        <div class="badge">🏆</div>
+        <h2>闯关完成！</h2>
+        <div class="score" id="final-score">0/100</div>
+        <p id="result-msg">继续加油！</p>
+        <button class="restart-btn" onclick="location.reload()">重新挑战</button>
+        <a href="menu.html" class="home-btn">返回菜单</a>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "1. 下列加点字的读音完全正确的一项是（ ）",
+            options: ["A. 廊腰缦回（mān） 妃嫔媵嫱（pín）", "B. 囷囷焉（qūn） 鼎铛玉石（dāng）", "C. 逦迤（lǐ yǐ） 锱铢必较（zī zhū）", "D. 在庾之粟粒（yú） 尽态极妍（yán）"],
+            answer: 2, // C
+            explanation: "A项"缦"应读màn；B项"铛"应读chēng；D项"庾"应读yǔ。"
+        },
+        {
+            q: "2. 下列对句子中加点词的解释，不正确的一项是（ ）",
+            options: ["A. 蜀山兀，阿房出（兀：光秃）", "B. 矗不知其几千万落（矗：高耸，直立）", "C. 族秦者秦也（族：家族）", "D. 覆压三百余里（覆：覆盖）"],
+            answer: 2, // C
+            explanation: "C项错误。"族"在此处是使动用法，意为"使……灭族/灭亡"，而非名词"家族"。"
+        },
+        {
+            q: "3. "鼎铛玉石，金块珠砾"中，"铛"和"砾"的正确解释是（ ）",
+            options: ["A. 铃铛；瓦片", "B. 平底锅；小石子", "C. 铁锅；泥沙", "D. 金属器皿；碎石"],
+            answer: 1, // B
+            explanation: "结合文意，秦人将宝鼎当作平底锅（铛），珍珠当作小石子（砾），极言其奢靡不爱惜。"
+        },
+        {
+            q: "4. 下列句子中，加点词的含义与现代汉语相同的一项是（ ）",
+            options: ["A. 各抱地势，钩心斗角", "B. 一日之内，一宫之间，而气候不齐", "C. 楚人一炬，可怜焦土", "D. 钉头磷磷，多于在庾之粟粒"],
+            answer: 3, // D
+            explanation: "A项古义指建筑结构精巧，今义指人际争斗；B项古义指天气冷暖，今义指气象概况；C项古义指可惜，今义指值得怜悯；D项"粟粒"古今均指粮食/小米。"
+        },
+        {
+            q: "5. "奈何取之尽锱铢，用之如泥沙"中，"锱铢"一词用来形容（ ）",
+            options: ["A. 极其微小的数量", "B. 一种锋利的兵器", "C. 沉重的赋税", "D. 珍贵的金银珠宝"],
+            answer: 0, // A
+            explanation: ""锱铢"是古代极小的重量单位，此处形容秦统治者搜刮百姓财物一分一厘都不放过。"
+        },
+        {
+            q: "6. 关于"钩心斗角"在《阿房宫赋》中的含义，下列说法正确的是（ ）",
+            options: ["A. 形容妃嫔之间互相争斗", "B. 形容建筑结构参差错落、精巧工致", "C. 形容统治者与百姓矛盾尖锐", "D. 形容作战时的战术布局"],
+            answer: 1, // B
+            explanation: "在文中，"钩心斗角"是古今异义词，形容阿房宫宫室结构参差错落、精巧工致。"
+        },
+        {
+            q: "7. "楚人一炬，可怜焦土"中，"可怜"一词表达了作者怎样的情感？（ ）",
+            options: ["A. 对阿房宫被焚毁的深深惋惜", "B. 对楚人残暴行为的强烈谴责", "C. 对秦国百姓流离失所的无限怜悯", "D. 对秦朝统治者奢靡生活的讽刺"],
+            answer: 0, // A
+            explanation: "文中的"可怜"意为"可惜"。作者借此抒发对阿房宫这一宏伟建筑被毁的惋惜，以及对秦亡的感慨。"
+        },
+        {
+            q: "8. 下列句子中，与"使负栋之柱，多于南亩之农夫"句式特点相同的一项是（ ）",
+            options: ["A. 廊腰缦回，檐牙高啄", "B. 明星荧荧，开妆镜也", "C. 戍卒叫，函谷举", "D. 钉头磷磷，多于在庾之粟粒"],
+            answer: 3, // D
+            explanation: "例句和D项均为介词结构后置句（状语后置），即"于南亩之农夫多"、"于在庾之粟粒多"。"
+        },
+        {
+            q: "9. 下列对"妃嫔媵嫱"中"媵"字的解释，正确的一项是（ ）",
+            options: ["A. 古代宫廷中的高级女官", "B. 古代诸侯女儿出嫁时陪嫁的女子", "C. 秦国本地招募的宫女", "D. 六国战败后被俘虏的普通百姓"],
+            answer: 1, // B
+            explanation: ""媵"指古代诸侯女儿出嫁时陪嫁的女子，此处与"妃、嫔、嫱"连用，统称六国的妃嫔宫人。"
+        },
+        {
+            q: "10. 结合语境，对"囷囷焉"一词的理解，最准确的一项是（ ）",
+            options: ["A. 形容建筑群密集而回旋的样子", "B. 形容建筑群高大而雄伟的样子", "C. 形容内部装饰华丽而繁复的样子", "D. 形容周围山水环绕而幽静的样子"],
+            answer: 0, // A
+            explanation: ""囷囷"（qūn qūn）形容建筑密集回旋的样子，与"盘盘"连用，描绘阿房宫建筑群的复杂结构。"
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    function loadQuestion() {
+        answered = false;
+        const qData = questions[currentQuestion];
+        document.getElementById('question').textContent = qData.q;
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        // 更新进度条
+        const progress = ((currentQuestion) / questions.length) * 100;
+        document.getElementById('progress').style.width = progress + '%';
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+
+        qData.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        if (answered) return;
+        answered = true;
+
+        const qData = questions[currentQuestion];
+        const feedback = document.getElementById('feedback');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackText = document.getElementById('feedback-text');
+        const allBtns = document.querySelectorAll('.option-btn');
+
+        // 禁用所有按钮
+        allBtns.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === qData.answer) {
+            score += 10;
+            btnElement.classList.add('correct');
+            feedback.className = 'feedback show correct';
+            feedbackTitle.textContent = '✅ 回答正确！';
+        } else {
+            btnElement.classList.add('wrong');
+            allBtns[qData.answer].classList.add('correct');
+            feedback.className = 'feedback show wrong';
+            feedbackTitle.textContent = '❌ 回答错误';
+        }
+
+        feedbackText.textContent = qData.explanation;
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('progress').style.width = '100%';
+        
+        const finalScore = document.getElementById('final-score');
+        finalScore.textContent = score + '分';
+        
+        const msg = document.getElementById('result-msg');
+        if (score === 100) {
+            msg.textContent = "太棒了！你已获得【阿房宫金牌修复师】称号！🏅";
+        } else if (score >= 80) {
+            msg.textContent = "成绩优异！文言基础非常扎实！👍";
+        } else if (score >= 60) {
+            msg.textContent = "及格了，但还有提升空间，继续加油！💪";
+        } else {
+            msg.textContent = "基础还需要加强哦，建议复习后再来挑战！📚";
+        }
+    }
+
+    // 初始化
+    loadQuestion();
+</script>
+
+</body>
+</html>
