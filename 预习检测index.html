@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿房宫赋 课前学习自测系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "楷体", "华文楷体", "宋体", serif;
+        }
+        body {
+            background-color: #f6efe3;
+            background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 65 L70 75 L60 85 L50 75 Z' fill='%23d3c4b0' fill-opacity='0.12'/%3E%3C/svg%3E");
+            color: #4a3828;
+            font-size: 17px;
+            line-height: 1.9;
+        }
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .main-title {
+            text-align: center;
+            font-size: 34px;
+            color: #702e18;
+            letter-spacing: 4px;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #c9b5a3;
+        }
+        .login-box {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-box input {
+            padding: 8px 12px;
+            width: 220px;
+            border: 1px solid #c9b5a3;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-right: 10px;
+            background: #fff;
+        }
+        .home-card-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        .home-card {
+            width: 260px;
+            height: 170px;
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            color: #702e18;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(120,95,70,0.15);
+            transition: 0.3s;
+        }
+        .home-card:hover {
+            background: #f3e9da;
+            transform: translateY(-4px);
+        }
+        .page { display: none; }
+        .active-page { display: block; }
+        .prep-box {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .prep-box h3 {
+            color: #8c3d20;
+            margin: 18px 0 8px;
+            font-size: 21px;
+        }
+        .prep-box ul { padding-left: 25px; }
+        .question {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+        .option {
+            margin: 5px 0;
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+        .option:hover { background: #f3e9da; }
+        .btn {
+            padding: 9px 22px;
+            background: #8c3d20;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px 5px;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #702e18; }
+        .btn-back { background: #a08060; }
+        .btn-danger { background: #b34040; }
+        .btn-success { background: #407c58; }
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background: #fff8f0;
+            border: 2px solid #c9b5a3;
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+        }
+        .data-panel {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+        }
+        th,td {
+            border: 1px solid #c9b5a3;
+            padding: 8px;
+            text-align: center;
+        }
+        th { background: #f3e9da; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主页 -->
+        <div id="homePage" class="page active-page">
+            <h1 class="main-title">阿房宫赋 课前学习自测系统</h1>
+            <div class="login-box">
+                <p>请输入真实姓名进入系统（每人仅限一个账号）</p>
+                <input type="text" id="stuName" placeholder="请输入你的姓名">
+                <button class="btn" onclick="enterSystem()">进入系统</button>
+            </div>
+            <div class="home-card-wrap">
+                <div class="home-card" onclick="goPage('testPage')">课前基础自测</div>
+                <div class="home-card" onclick="goPage('dataPage')">班级答题数据统计</div>
+            </div>
+        </div>
+
+        <!-- 自测页面 -->
+        <div id="testPage" class="page">
+            <h1 class="main-title">课前基础自测（10题 随机抽取）</h1>
+            <div id="testBox"></div>
+            <button class="btn" onclick="submitTest()">提交答卷</button>
+            <button class="btn btn-back" onclick="goPage('homePage')">返回主页</button>
+
+            <!-- 成绩弹窗 -->
+            <div class="modal" id="resultModal">
+                <div class="modal-content">
+                    <h3 id="scoreText"></h3>
+                    <p id="errorText" style="margin:15px 0;"></p>
+                    <button class="btn btn-back" onclick="goPage('homePage');closeModal()">返回主页</button>
+                    <button class="btn" onclick="resetTest();closeModal()">重新抽题测试</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据统计页面 -->
+        <div id="dataPage" class="page">
+            <h1 class="main-title">班级答题数据统计与对比分析</h1>
+            <div class="data-panel">
+                <div id="dataInfo"></div>
+                <div style="margin:15px 0;">
+                    <button class="btn btn-success" onclick="exportExcel()">导出成绩表格</button>
+                    <button class="btn btn-danger" onclick="resetAllData()">重置全班所有数据</button>
+                </div>
+                <table id="dataTable"></table>
+            </div>
+            <button class="btn btn-back" onclick="goPage('homePage')">返回主页</button>
+        </div>
+    </div>
+
+    <script>
+        let currentName = "";
+        // 总题库 20题
+        const questionBank = [
+            {type:'fill',q:'1. 《阿房宫赋》作者是晚唐_______。',ans:'杜牧'},
+            {type:'fill',q:'2. 杜牧与李商隐并称_______。',ans:'小李杜'},
+            {type:'fill',q:'3. 本文文体是_______。',ans:'赋'},
+            {type:'fill',q:'4. 阿房宫正确读音是_______。',ans:'ē páng'},
+            {type:'fill',q:'5. 赋的特点是铺采摛文，_______。',ans:'体物写志'},
+            {type:'fill',q:'6. 本文核心手法是_______讽今。',ans:'借古'},
+            {type:'fill',q:'7. “钩心斗角”古义指_______结构精巧。',ans:'宫室'},
+            {type:'fill',q:'8. 妃嫔媵嫱指代宫廷_______。',ans:'宫女'},
+            {type:'fill',q:'9. 文章劝谏_______统治者戒奢靡。',ans:'晚唐'},
+            {type:'fill',q:'10. 锱铢是古代极小的_______单位。',ans:'重量'},
+            {type:'choice',q:'11. 杜牧所处朝代是？',opt:['A.初唐','B.盛唐','C.中唐','D.晚唐'],ans:'D'},
+            {type:'choice',q:'12. 《阿房宫赋》文体是？',opt:['A.律诗','B.词','C.赋','D.记叙文'],ans:'C'},
+            {type:'choice',q:'13. 本文写作意图是？',opt:['A.赞美建筑','B.借秦亡讽谏晚唐','C.记录历史','D.描写宫廷生活'],ans:'B'},
+            {type:'choice',q:'14. 不属于赋特点的是？',opt:['A.铺陈夸张','B.辞藻华丽','C.只抒情不议论','D.体物写志'],ans:'C'},
+            {type:'choice',q:'15. “钩心斗角”文中古义是？',opt:['A.人心算计','B.宫室结构精巧','C.兵器碰撞','D.地势交错'],ans:'B'},
+            {type:'choice',q:'16. 文章行文顺序正确的是？',opt:['A.议论→建筑→美人','B.建筑→美人→珍宝→议论','C.珍宝→建筑→议论','D.美人→建筑→议论'],ans:'B'},
+            {type:'choice',q:'17. “缦立远视”中“缦”意为？',opt:['A.迅速','B.长久','C.随意','D.悲伤'],ans:'B'},
+            {type:'choice',q:'18. 不属于本文艺术手法的是？',opt:['A.铺陈夸张','B.对比反衬','C.借古讽今','D.白描写实无修饰'],ans:'D'},
+            {type:'choice',q:'19. “后人哀之而不鉴之”中“鉴”用法是？',opt:['A.镜子','B.以……为借鉴','C.明亮','D.白白地'],ans:'B'},
+            {type:'choice',q:'20. 对本文说法错误的是？',opt:['A.骈散结合','B.只叙事无观点','C.铺陈后讽谏','D.借古警示当朝'],ans:'B'}
+        ];
+
+        let currentQuestions = []; // 当前显示的10道随机题
+        let userAnswer = [];
+
+        // 进入系统
+        function enterSystem(){
+            let name = document.getElementById("stuName").value.trim();
+            if(!name){
+                alert("请输入姓名！");
+                return;
+            }
+            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
+            let has = all.find(x=>x.name===name);
+            if(has){
+                alert("该姓名已存在，直接开始学习自测即可！");
+            }
+            currentName = name;
+            alert("欢迎你，"+name+"，可开始预习与自测");
+        }
+
+        // 页面切换
+        function goPage(id){
+            document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));
+            document.getElementById(id).classList.add("active-page");
+            if(id==="testPage") initTest();
+            if(id==="dataPage") showAllData();
+        }
+        function closeModal(){
+            document.getElementById("resultModal").style.display="none";
+        }
+        function resetTest(){
+            initTest();
+        }
+
+        // 从20题中随机抽取10题
+        function getRandomQuestions(){
+            let arr = [...questionBank];
+            // 打乱顺序
+            for(let i=arr.length-1; i>0; i--){
+                let j = Math.floor(Math.random()*(i+1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            // 取前10道
+            return arr.slice(0,10);
+        }
+
+        // 初始化试卷
+        function initTest(){
+            currentQuestions = getRandomQuestions();
+            userAnswer = [];
+            let html = "";
+            currentQuestions.forEach((item, idx)=>{
+                html += `<div class="question"><p>${item.q}</p>`;
+                if(item.type === "fill"){
+                    html += `<input type="text" id="ans${idx}" style="width:200px;padding:6px;border:1px solid #c9b5a3;border-radius:4px;">`;
+                }else{
+                    item.opt.forEach(o=>{
+                        html += `<div class="option"><label><input type="radio" name="ans${idx}" value="${o[0]}"> ${o}</label></div>`;
+                    });
+                }
+                html += `</div>`;
+            });
+            document.getElementById("testBox").innerHTML = html;
+        }
+
+        // 提交判分
+        function submitTest(){
+            if(!currentName){
+                alert("请先在主页输入姓名！");
+                return;
+            }
+            let score = 0;
+            let errorNum = [];
+            currentQuestions.forEach((item, idx)=>{
+                let val = "";
+                if(item.type === "fill"){
+                    val = document.getElementById(`ans${idx}`).value.trim();
+                }else{
+                    let r = document.querySelector(`input[name="ans${idx}"]:checked`);
+                    val = r ? r.value : "";
+                }
+                userAnswer.push(val);
+                if(val === item.ans) score += 10; // 10题 每题10分 满分100
+                else errorNum.push(idx + 1);
+            });
+            saveStudentData(currentName, score);
+            document.getElementById("scoreText").innerText = `得分：${score} 分（满分100）`;
+            document.getElementById("errorText").innerText = errorNum.length>0 ? `错题：${errorNum.join('、')}` : "全对，非常优秀！";
+            document.getElementById("resultModal").style.display = "flex";
+        }
+
+        // 保存学生两次成绩
+        function saveStudentData(name,score){
+            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
+            let stu = all.find(x=>x.name===name);
+            if(!stu){
+                all.push({name:name,first:score,second:0});
+            }else{
+                if(stu.second === 0){
+                    stu.second = score;
+                }else{
+                    stu.first = stu.second;
+                    stu.second = score;
+                }
+            }
+            localStorage.setItem("aFangAllData",JSON.stringify(all));
+        }
+
+        // 展示统计表格
+        function showAllData(){
+            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
+            if(all.length===0){
+                document.getElementById("dataInfo").innerHTML = "暂无学生答题数据";
+                document.getElementById("dataTable").innerHTML = "";
+                return;
+            }
+            let sum1=0,sum2=0,cnt1=0,cnt2=0;
+            all.forEach(s=>{
+                if(s.first>0) {sum1+=s.first;cnt1++;}
+                if(s.second>0) {sum2+=s.second;cnt2++;}
+            });
+            let avg1 = cnt1?(sum1/cnt1).toFixed(1):0;
+            let avg2 = cnt2?(sum2/cnt2).toFixed(1):0;
+            let tip = Number(avg2)>Number(avg1) ? "整体成绩有提升" : "整体成绩持平或略有下降";
+            let info = `
+                参与人数：${all.length} 人<br>
+                首次作答平均分：${avg1} 分<br>
+                二次作答平均分：${avg2} 分<br>
+                两次对比分析：${tip}
+            `;
+            document.getElementById("dataInfo").innerHTML = info;
+            let table = `<tr><th>姓名</th><th>第一次成绩</th><th>第二次成绩</th><th>成绩变化</th></tr>`;
+            all.forEach(s=>{
+                let diff = s.second>0 ? (s.second-s.first) + " 分" : "未重测";
+                table += `<tr>
+                    <td>${s.name}</td>
+                    <td>${s.first}</td>
+                    <td>${s.second||"未作答"}</td>
+                    <td>${diff}</td>
+                </tr>`;
+            });
+            document.getElementById("dataTable").innerHTML = table;
+        }
+
+        // 导出Excel表格
+        function exportExcel(){
+            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
+            if(all.length===0){
+                alert("暂无数据可导出");
+                return;
+            }
+            let csv = "姓名,第一次成绩,第二次成绩,成绩变化\n";
+            all.forEach(s=>{
+                let diff = s.second>0 ? (s.second-s.first)+"分" : "未重测";
+                csv += `${s.name},${s.first},${s.second||"未作答"},${diff}\n`;
+            });
+            let blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "阿房宫赋预习成绩统计表.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 重置所有数据
+        function resetAllData(){
+            if(confirm("确定要清空全班所有学生答题数据吗？此操作不可恢复！")){
+                localStorage.removeItem("aFangAllData");
+                alert("已重置所有数据");
+                showAllData();
+            }
+        }
+
+        window.onload = function(){
+            initTest();
+        };
+    </script>
+</body>
+</html>
