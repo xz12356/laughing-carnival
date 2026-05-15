@@ -162,7 +162,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- 主页 -->
         <div id="homePage" class="page active-page">
             <h1 class="main-title">阿房宫赋 课前学习自测系统</h1>
             <div class="login-box">
@@ -176,14 +175,12 @@
             </div>
         </div>
 
-        <!-- 自测页面 -->
         <div id="testPage" class="page">
             <h1 class="main-title">课前基础自测（10题 随机抽取）</h1>
             <div id="testBox"></div>
             <button class="btn" onclick="submitTest()">提交答卷</button>
             <button class="btn btn-back" onclick="goPage('homePage')">返回主页</button>
 
-            <!-- 成绩弹窗 -->
             <div class="modal" id="resultModal">
                 <div class="modal-content">
                     <h3 id="scoreText"></h3>
@@ -194,7 +191,6 @@
             </div>
         </div>
 
-        <!-- 数据统计页面 -->
         <div id="dataPage" class="page">
             <h1 class="main-title">班级答题数据统计与对比分析</h1>
             <div class="data-panel">
@@ -211,7 +207,25 @@
 
     <script>
         let currentName = "";
-        // 总题库 20题
+
+        // ====================== 永久数据存储 ======================
+        const GLOBAL_DATA_KEY = "afang_gong_system_data_2025";
+
+        // 读取所有学生数据（永久保存）
+        function getAllData() {
+            try {
+                return JSON.parse(localStorage.getItem(GLOBAL_DATA_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // 保存学生数据（永久）
+        function saveAllData(list) {
+            localStorage.setItem(GLOBAL_DATA_KEY, JSON.stringify(list));
+        }
+
+        // 题库
         const questionBank = [
             {type:'fill',q:'1. 《阿房宫赋》作者是晚唐_______。',ans:'杜牧'},
             {type:'fill',q:'2. 杜牧与李商隐并称_______。',ans:'小李杜'},
@@ -235,62 +249,62 @@
             {type:'choice',q:'20. 对本文说法错误的是？',opt:['A.骈散结合','B.只叙事无观点','C.铺陈后讽谏','D.借古警示当朝'],ans:'B'}
         ];
 
-        let currentQuestions = []; // 当前显示的10道随机题
+        let currentQuestions = [];
         let userAnswer = [];
 
-        // 进入系统
-        function enterSystem(){
+        // 进入系统（永久账号）
+        function enterSystem() {
             let name = document.getElementById("stuName").value.trim();
-            if(!name){
-                alert("请输入姓名！");
-                return;
-            }
-            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
-            let has = all.find(x=>x.name===name);
-            if(has){
-                alert("该姓名已存在，直接开始学习自测即可！");
-            }
+            if (!name) { alert("请输入姓名！"); return; }
+            
+            let all = getAllData();
+            let exists = all.find(s => s.name === name);
+            
             currentName = name;
-            alert("欢迎你，"+name+"，可开始预习与自测");
+            if (exists) {
+                alert("欢迎回来，" + name + "！你的历史成绩已保存。");
+            } else {
+                alert("欢迎你，" + name + "，已为你创建永久账号！");
+            }
         }
 
         // 页面切换
-        function goPage(id){
-            document.querySelectorAll(".page").forEach(p=>p.classList.remove("active-page"));
+        function goPage(id) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("active-page"));
             document.getElementById(id).classList.add("active-page");
-            if(id==="testPage") initTest();
-            if(id==="dataPage") showAllData();
+            if (id === "testPage") initTest();
+            if (id === "dataPage") showAllData();
         }
-        function closeModal(){
-            document.getElementById("resultModal").style.display="none";
+
+        function closeModal() {
+            document.getElementById("resultModal").style.display = "none";
         }
-        function resetTest(){
+
+        function resetTest() {
             initTest();
         }
 
-        // 从20题中随机抽取10题
-        function getRandomQuestions(){
+        // 随机抽题
+        function getRandomQuestions() {
             let arr = [...questionBank];
-            // 打乱顺序
-            for(let i=arr.length-1; i>0; i--){
-                let j = Math.floor(Math.random()*(i+1));
+            for (let i = arr.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
                 [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-            // 取前10道
-            return arr.slice(0,10);
+            return arr.slice(0, 10);
         }
 
         // 初始化试卷
-        function initTest(){
+        function initTest() {
             currentQuestions = getRandomQuestions();
             userAnswer = [];
             let html = "";
-            currentQuestions.forEach((item, idx)=>{
+            currentQuestions.forEach((item, idx) => {
                 html += `<div class="question"><p>${item.q}</p>`;
-                if(item.type === "fill"){
+                if (item.type === "fill") {
                     html += `<input type="text" id="ans${idx}" style="width:200px;padding:6px;border:1px solid #c9b5a3;border-radius:4px;">`;
-                }else{
-                    item.opt.forEach(o=>{
+                } else {
+                    item.opt.forEach(o => {
                         html += `<div class="option"><label><input type="radio" name="ans${idx}" value="${o[0]}"> ${o}</label></div>`;
                     });
                 }
@@ -299,116 +313,99 @@
             document.getElementById("testBox").innerHTML = html;
         }
 
-        // 提交判分
-        function submitTest(){
-            if(!currentName){
-                alert("请先在主页输入姓名！");
-                return;
-            }
+        // 提交（成绩永久保存）
+        function submitTest() {
+            if (!currentName) { alert("请先输入姓名！"); return; }
             let score = 0;
-            let errorNum = [];
-            currentQuestions.forEach((item, idx)=>{
+            let errors = [];
+            currentQuestions.forEach((item, idx) => {
                 let val = "";
-                if(item.type === "fill"){
+                if (item.type === "fill") {
                     val = document.getElementById(`ans${idx}`).value.trim();
-                }else{
+                } else {
                     let r = document.querySelector(`input[name="ans${idx}"]:checked`);
                     val = r ? r.value : "";
                 }
-                userAnswer.push(val);
-                if(val === item.ans) score += 10; // 10题 每题10分 满分100
-                else errorNum.push(idx + 1);
+                if (val === item.ans) score += 10;
+                else errors.push(idx + 1);
             });
-            saveStudentData(currentName, score);
-            document.getElementById("scoreText").innerText = `得分：${score} 分（满分100）`;
-            document.getElementById("errorText").innerText = errorNum.length>0 ? `错题：${errorNum.join('、')}` : "全对，非常优秀！";
+
+            // 永久保存成绩
+            let all = getAllData();
+            let stu = all.find(s => s.name === currentName);
+            if (!stu) {
+                all.push({ name: currentName, first: score, second: 0 });
+            } else {
+                if (stu.second === 0) stu.second = score;
+                else { stu.first = stu.second; stu.second = score; }
+            }
+            saveAllData(all);
+
+            document.getElementById("scoreText").innerText = `得分：${score} 分`;
+            document.getElementById("errorText").innerText = errors.length ? `错题：${errors.join("、")}` : "全对！";
             document.getElementById("resultModal").style.display = "flex";
         }
 
-        // 保存学生两次成绩
-        function saveStudentData(name,score){
-            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
-            let stu = all.find(x=>x.name===name);
-            if(!stu){
-                all.push({name:name,first:score,second:0});
-            }else{
-                if(stu.second === 0){
-                    stu.second = score;
-                }else{
-                    stu.first = stu.second;
-                    stu.second = score;
-                }
-            }
-            localStorage.setItem("aFangAllData",JSON.stringify(all));
-        }
-
-        // 展示统计表格
-        function showAllData(){
-            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
-            if(all.length===0){
-                document.getElementById("dataInfo").innerHTML = "暂无学生答题数据";
+        // 显示全班数据
+        function showAllData() {
+            let all = getAllData();
+            if (all.length === 0) {
+                document.getElementById("dataInfo").innerHTML = "暂无学生数据";
                 document.getElementById("dataTable").innerHTML = "";
                 return;
             }
-            let sum1=0,sum2=0,cnt1=0,cnt2=0;
-            all.forEach(s=>{
-                if(s.first>0) {sum1+=s.first;cnt1++;}
-                if(s.second>0) {sum2+=s.second;cnt2++;}
+            let sum1 = 0, cnt1 = 0, sum2 = 0, cnt2 = 0;
+            all.forEach(s => {
+                if (s.first > 0) { sum1 += s.first; cnt1++; }
+                if (s.second > 0) { sum2 += s.second; cnt2++; }
             });
-            let avg1 = cnt1?(sum1/cnt1).toFixed(1):0;
-            let avg2 = cnt2?(sum2/cnt2).toFixed(1):0;
-            let tip = Number(avg2)>Number(avg1) ? "整体成绩有提升" : "整体成绩持平或略有下降";
-            let info = `
-                参与人数：${all.length} 人<br>
-                首次作答平均分：${avg1} 分<br>
-                二次作答平均分：${avg2} 分<br>
-                两次对比分析：${tip}
+            let avg1 = cnt1 ? (sum1 / cnt1).toFixed(1) : 0;
+            let avg2 = cnt2 ? (sum2 / cnt2).toFixed(1) : 0;
+            let tip = avg2 > avg1 ? "成绩整体提升" : "成绩基本持平";
+
+            document.getElementById("dataInfo").innerHTML = `
+                总人数：${all.length}<br>
+                首次平均分：${avg1}<br>
+                二次平均分：${avg2}<br>
+                整体情况：${tip}
             `;
-            document.getElementById("dataInfo").innerHTML = info;
-            let table = `<tr><th>姓名</th><th>第一次成绩</th><th>第二次成绩</th><th>成绩变化</th></tr>`;
-            all.forEach(s=>{
-                let diff = s.second>0 ? (s.second-s.first) + " 分" : "未重测";
-                table += `<tr>
-                    <td>${s.name}</td>
-                    <td>${s.first}</td>
-                    <td>${s.second||"未作答"}</td>
-                    <td>${diff}</td>
-                </tr>`;
+
+            let table = `<tr><th>姓名</th><th>第一次</th><th>第二次</th><th>变化</th></tr>`;
+            all.forEach(s => {
+                let diff = s.second > 0 ? (s.second - s.first) + " 分" : "未重测";
+                table += `<tr><td>${s.name}</td><td>${s.first}</td><td>${s.second || "未答"}</td><td>${diff}</td></tr>`;
             });
             document.getElementById("dataTable").innerHTML = table;
         }
 
-        // 导出Excel表格
-        function exportExcel(){
-            let all = JSON.parse(localStorage.getItem("aFangAllData")) || [];
-            if(all.length===0){
-                alert("暂无数据可导出");
-                return;
-            }
-            let csv = "姓名,第一次成绩,第二次成绩,成绩变化\n";
-            all.forEach(s=>{
-                let diff = s.second>0 ? (s.second-s.first)+"分" : "未重测";
-                csv += `${s.name},${s.first},${s.second||"未作答"},${diff}\n`;
+        // 导出表格
+        function exportExcel() {
+            let all = getAllData();
+            if (all.length === 0) { alert("暂无数据"); return; }
+            let csv = "姓名,第一次成绩,第二次成绩,变化\n";
+            all.forEach(s => {
+                let diff = s.second > 0 ? (s.second - s.first) + "分" : "未重测";
+                csv += `${s.name},${s.first},${s.second || "未答"},${diff}\n`;
             });
-            let blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+            let blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
             let url = URL.createObjectURL(blob);
             let a = document.createElement("a");
             a.href = url;
-            a.download = "阿房宫赋预习成绩统计表.csv";
+            a.download = "阿房宫赋成绩表.csv";
             a.click();
             URL.revokeObjectURL(url);
         }
 
-        // 重置所有数据
-        function resetAllData(){
-            if(confirm("确定要清空全班所有学生答题数据吗？此操作不可恢复！")){
-                localStorage.removeItem("aFangAllData");
-                alert("已重置所有数据");
+        // 清空所有数据
+        function resetAllData() {
+            if (confirm("确定清空所有数据？不可恢复！")) {
+                saveAllData([]);
+                alert("已清空");
                 showAllData();
             }
         }
 
-        window.onload = function(){
+        window.onload = function () {
             initTest();
         };
     </script>
