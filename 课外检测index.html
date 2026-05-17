@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿房宫赋 预习检测｜分层闯关自测</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "楷体", "华文楷体", "微软雅黑", serif;
+        }
+        body {
+            background-color: #f6efe3;
+            background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 65 L70 75 L60 85 L50 75 Z' fill='%23d3c4b0' fill-opacity='0.12'/%3E%3C/svg%3E");
+            color: #4a3828;
+            font-size: 17px;
+            line-height: 1.9;
+        }
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .main-title {
+            text-align: center;
+            font-size: 34px;
+            color: #702e18;
+            letter-spacing: 4px;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #c9b5a3;
+        }
+        .login-box {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-box input {
+            padding: 8px 12px;
+            width: 220px;
+            border: 1px solid #c9b5a3;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-right: 10px;
+            background: #fff;
+        }
+        .enter-main-btn {
+            margin: 20px auto;
+            display: block;
+            padding: 12px 40px;
+            font-size: 20px;
+        }
+        .rule-tip {
+            color: #8c3d20;
+            margin-top: 12px;
+            font-weight: bold;
+            text-align:center;
+        }
+        .level-wrap {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+        .level-card {
+            width: 220px;
+            height: 160px;
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #702e18;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(120,95,70,0.15);
+            transition: 0.3s;
+            position: relative;
+        }
+        .level-card:hover {
+            background: #f3e9da;
+            transform: translateY(-4px);
+        }
+        .lock-mask {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            letter-spacing: 2px;
+        }
+        .page { display: none; }
+        .active-page { display: block; }
+        .prep-box {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .prep-box h3 {
+            color: #8c3d20;
+            margin: 18px 0 8px;
+            font-size: 21px;
+        }
+        .prep-box ul { padding-left: 25px; }
+        .prep-finish-tip {
+            margin-top:20px;
+            padding:15px;
+            background:#e8f4ea;
+            border-radius:8px;
+            text-align:center;
+            color:#2a803e;
+            font-weight:bold;
+        }
+        .question {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 8px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+        .option {
+            margin: 5px 0;
+            cursor: pointer;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+        .option:hover { background: #f3e9da; }
+        .input-ans {
+            width: 200px;
+            padding: 6px;
+            border: 1px solid #c9b5a3;
+            border-radius: 4px;
+            outline: none;
+        }
+        .btn {
+            padding: 9px 22px;
+            background: #8c3d20;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 8px 5px;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #702e18; }
+        .btn-back { background: #a08060; }
+        .btn-danger { background: #b34040; }
+        .btn-success { background: #407c58; }
+        .btn-analysis {
+            display: block;
+            margin: 30px auto 20px;
+            padding: 10px 30px;
+        }
+        .btn-single-analysis {
+            background:#407c58;
+        }
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        .modal-content {
+            background: #fff8f0;
+            border: 2px solid #c9b5a3;
+            border-radius: 12px;
+            padding: 35px;
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+        }
+        .analysis-panel,.single-analysis-panel {
+            background: #fff8f0;
+            border: 1px solid #c9b5a3;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        .analysis-item {
+            padding: 10px 0;
+            border-bottom: 1px dashed #c9b5a3;
+        }
+        .eval-text {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f3e9da;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+        }
+        th,td {
+            border: 1px solid #c9b5a3;
+            padding: 8px;
+            text-align: center;
+        }
+        th { background: #f3e9da; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 首页 -->
+        <div id="homePage" class="page active-page">
+            <h1 class="main-title">阿房宫赋 分层闯关自测系统</h1>
+            <div class="login-box">
+                <p>请输入真实姓名</p>
+                <input type="text" id="stuName" placeholder="请输入你的姓名">
+            </div>
+            <button class="btn enter-main-btn" onclick="enterSystem()">进入自测系统</button>
+
+            <p class="rule-tip">闯关规则：每关答对≥8题通关，必须按顺序通关解锁下一关</p>
+
+            <div class="level-wrap">
+                <div class="level-card" id="card1" onclick="openLevel(1)">
+                    第一关·基础过关
+                    <div class="lock-mask" id="lock1">已解锁</div>
+                </div>
+                <div class="level-card" id="card2" onclick="openLevel(2)">
+                    第二关·巩固提升
+                    <div class="lock-mask" id="lock2">未通关<br>锁定</div>
+                </div>
+                <div class="level-card" id="card3" onclick="openLevel(3)">
+                    第三关·拔高培优
+                    <div class="lock-mask" id="lock3">未通关<br>锁定</div>
+                </div>
+            </div>
+
+            <div style="text-align:center;margin-top:20px;">
+                <button class="btn btn-success" onclick="goPage('dataPage')">班级数据统计</button>
+            </div>
+
+            <button class="btn btn-analysis" onclick="goPage('analysisPage')">查看个人全部答题情况分析</button>
+        </div>
+
+        <!-- 个人总答题分析页面 -->
+        <div id="analysisPage" class="page">
+            <h1 class="main-title">个人答题情况综合分析</h1>
+            <div class="analysis-panel" id="analysisBox"></div>
+            <button class="btn btn-back" style="margin-top:30px;" onclick="goPage('homePage')">返回主页</button>
+        </div>
+
+        <!-- 本关单独分析页面 -->
+        <div id="singleAnalysisPage" class="page">
+            <h1 class="main-title">本关答题情况分析</h1>
+            <div class="single-analysis-panel" id="singleAnalysisBox"></div>
+            <button class="btn btn-back" style="margin-top:30px;" onclick="goPage('homePage')">返回主页</button>
+        </div>
+
+        <!-- 知识点预习页保留 -->
+        <div id="prepPage" class="page">
+            <h1 class="main-title">阿房宫赋 核心预习知识点</h1>
+            <div class="prep-box">
+                <h3>一、文学常识</h3>
+                <ul>
+                    <li>作者：杜牧，晚唐文学家，字牧之，号樊川居士。</li>
+                    <li>与李商隐并称<strong>小李杜</strong>。</li>
+                    <li>文体：<strong>赋</strong>，特点：铺采摛文，体物写志。</li>
+                    <li>主旨：借秦奢靡亡国，讽谏晚唐统治者戒奢爱民。</li>
+                </ul>
+                <h3>二、重点字音</h3>
+                <p>阿房宫（ē páng）、缦回、檐牙高啄、囷囷、妃嫔媵嫱、剽掠、锱铢、逦迤、呕哑、辇。</p>
+                <h3>三、古今异义</h3>
+                <ul>
+                    <li>钩心斗角：古义宫室结构精巧错落；今义人心互相算计。</li>
+                    <li>明星荧荧：古义明亮星光；今义知名艺人。</li>
+                    <li>经营：古义搜集聚敛财物；今义筹划管理。</li>
+                </ul>
+                <h3>四、文言与艺术手法</h3>
+                <p>词类活用、特殊句式；主要手法：铺陈夸张、对比反衬、借古讽今、骈散结合。</p>
+            </div>
+            <button class="btn btn-back" style="margin-top:20px;" onclick="goPage('homePage')">返回主页</button>
+        </div>
+
+        <!-- 答题页面 -->
+        <div id="testPage" class="page">
+            <h1 class="main-title" id="levelTitle">关卡自测</h1>
+            <div id="testBox"></div>
+            <button class="btn" onclick="submitAnswer()">提交答卷</button>
+            <button class="btn btn-back" onclick="goPage('homePage')">返回主页</button>
+
+            <!-- 成绩弹窗 -->
+            <div class="modal" id="resModal">
+                <div class="modal-content">
+                    <h3 id="scoreTxt"></h3>
+                    <p id="passTxt" style="margin:12px 0;font-size:18px;"></p>
+                    <p id="errorTxt"></p>
+                    <button class="btn btn-back" onclick="backHome()">返回主页</button>
+                    <button class="btn hide" id="nextBtn" onclick="nextStage()">继续闯关</button>
+                    <!-- 每关结尾查看本关分析按键 -->
+                    <button class="btn btn-single-analysis" id="singleAnalysisBtn" onclick="goSingleAnalysis()">查看本关答题分析</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 班级数据统计页 -->
+        <div id="dataPage" class="page">
+            <h1 class="main-title">班级答题数据统计</h1>
+            <div class="data-panel">
+                <div id="dataInfo"></div>
+                <div style="margin:15px 0;">
+                    <button class="btn btn-success" onclick="exportTable()">导出成绩表格</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">重置全部数据</button>
+                </div>
+                <table id="dataTable"></table>
+            </div>
+            <button class="btn btn-back" onclick="goPage('homePage')">返回主页</button>
+        </div>
+    </div>
+
+    <script>
+        let userName = "";
+        let currLevel = 1;
+        let passStatus = {1:0, 2:0, 3:0};
+        let levelScore = {1:0,2:0,3:0};
+        let levelWrong = {1:[],2:[],3:[]};
+
+        // 完整三关题库
+        const questionLib = {
+            1: [
+                {type:"fill", q:"1.《阿房宫赋》的作者是晚唐文学家________。", ans:"杜牧"},
+                {type:"fill", q:"2.杜牧与________并称为“小李杜”。", ans:"李商隐"},
+                {type:"fill", q:"3.阿房宫的标准注音是________。", ans:"ē páng"},
+                {type:"fill", q:"4.赋的文体特征是铺采摛文，________。", ans:"体物写志"},
+                {type:"fill", q:"5.《阿房宫赋》写作主旨是借古________。", ans:"讽今"},
+                {type:"judge", q:"6.杜牧是盛唐著名诗人。（对选√ 错选×）", ans:"×"},
+                {type:"judge", q:"7.“妃嫔媵嫱”指秦朝宫廷各类宫女妃妾。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"8.“钩心斗角”文中本义是人与人互相算计。（对选√ 错选×）", ans:"×"},
+                {type:"judge", q:"9.本文文体属于“赋”，介于诗文之间。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"10.作者写阿房宫只为赞美建筑艺术。（对选√ 错选×）", ans:"×"}
+            ],
+            2: [
+                {type:"choice", q:"1.下列不属于古今异义的一项是", opt:["A.明星荧荧","B.钩心斗角","C.六王毕","D.经营"], ans:"C"},
+                {type:"choice", q:"2.“缦立远视”中“缦”的含义是", opt:["A.缓慢、长久","B.快速","C.忧伤","D.随意"], ans:"A"},
+                {type:"choice", q:"3.文章整体行文顺序正确的是", opt:["A.议论—建筑—美人","B.建筑—美人—珍宝—议论","C.珍宝—议论—建筑","D.美人—议论—建筑"], ans:"B"},
+                {type:"choice", q:"4.《阿房宫赋》主要艺术手法不包括", opt:["A.借古讽今","B.铺陈夸张","C.白描写实无修饰","D.对比反衬"], ans:"C"},
+                {type:"choice", q:"5.“后人哀之而不鉴之”中“鉴”的用法是", opt:["A.名词 镜子","B.以……为借鉴","C.照亮","D.察看"], ans:"B"},
+                {type:"choice", q:"6.秦朝灭亡的根本原因作者认为是", opt:["A.外敌入侵","B.自然灾害","C.骄奢扰民、不爱百姓","D.臣子叛乱"], ans:"C"},
+                {type:"judge", q:"7.“锱铢”本义是古代极小的重量单位。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"8.文中“四海一”的“一”是数词，无活用。（对选√ 错选×）", ans:"×"},
+                {type:"judge", q:"9.赋文末一般会转入议论、寄托讽谏。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"10.本文骈散结合，音韵节奏感强。（对选√ 错选×）", ans:"√"}
+            ],
+            3: [
+                {type:"choice", q:"1.下列句子属于词类活用的一项是", opt:["A.六王毕，四海一","B.廊腰缦回","C.骊山北构而西折","D.以上都是"], ans:"D"},
+                {type:"choice", q:"2.作者极力铺陈阿房宫奢华宏大，用意是", opt:["A.赞美工匠技艺","B.反衬秦朝奢靡亡国","C.记录历史古迹","D.抒发游览感慨"], ans:"B"},
+                {type:"choice", q:"3.“使天下之人，不敢言而敢怒”意在强调", opt:["A.百姓胆小懦弱","B.秦朝暴政积怨深重","C.社会秩序安定","D.人们沉默冷漠"], ans:"B"},
+                {type:"choice", q:"4.下列对“借古讽今”理解正确的是", opt:["A.只叙述秦朝历史","B.借秦亡教训劝谏晚唐统治者","C.赞美古代盛世","D.讽刺古人愚昧"], ans:"B"},
+                {type:"choice", q:"5.下列说法有误的一项是", opt:["A.赋善于铺陈描摹、辞藻华丽","B.本文写景、叙事、抒情、议论融为一体","C.全文只写景不发表观点","D.警示统治者戒奢侈、重民心"], ans:"C"},
+                {type:"choice", q:"6.“明星荧荧，开妆镜也”运用的主要修辞是", opt:["A.夸张、比喻","B.拟人","C.设问","D.对偶"], ans:"A"},
+                {type:"judge", q:"7.“钩心斗角”古义指宫室结构参差错落、精巧工致。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"8.“呕哑”形容宫廷车马奔驰的声音。（对选√ 错选×）", ans:"×"},
+                {type:"judge", q:"9.文章大量排比铺陈，增强气势与批判力度。（对选√ 错选×）", ans:"√"},
+                {type:"judge", q:"10.作者希望晚唐统治者吸取秦亡教训，勤政爱民。（对选√ 错选×）", ans:"√"}
+            ]
+        };
+
+        // 页面切换
+        function goPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
+            document.getElementById(pageId).classList.add('active-page');
+            if (pageId === 'dataPage') showDataStatistics();
+            if (pageId === 'analysisPage') renderAnalysis();
+        }
+
+        // 进入系统
+        function enterSystem() {
+            const name = document.getElementById('stuName').value.trim();
+            if (!name) {
+                alert('请先输入姓名！');
+                return;
+            }
+            userName = name;
+            loadUserProgress();
+            updateLockUI();
+        }
+
+        // 加载记录
+        function loadUserProgress() {
+            const allData = JSON.parse(localStorage.getItem('afangUserData')) || [];
+            const user = allData.find(item => item.name === userName);
+            if(user){
+                passStatus = user.pass || {1:0,2:0,3:0};
+                levelScore = user.score || {1:0,2:0,3:0};
+                levelWrong = user.wrong || {1:[],2:[],3:[]};
+            }else{
+                passStatus = {1:0,2:0,3:0};
+                levelScore = {1:0,2:0,3:0};
+                levelWrong = {1:[],2:[],3:[]};
+            }
+        }
+
+        // 更新主页关卡锁定状态（严格顺序锁定）
+        function updateLockUI() {
+            // 第一关永久解锁
+            document.getElementById('lock1').classList.add('hide');
+            // 第二关：仅第一关通关才解锁
+            if(passStatus[1] === 1){
+                document.getElementById('lock2').classList.add('hide');
+            }else{
+                document.getElementById('lock2').classList.remove('hide');
+            }
+            // 第三关：仅第二关通关才解锁
+            if(passStatus[2] === 1){
+                document.getElementById('lock3').classList.add('hide');
+            }else{
+                document.getElementById('lock3').classList.remove('hide');
+            }
+        }
+
+        // 打开关卡 严格顺序限制
+        function openLevel(level) {
+            if (!userName) {
+                alert('请先输入姓名并点击进入自测系统！');
+                return;
+            }
+            // 禁止越级闯关
+            if(level === 2 && passStatus[1] !== 1){
+                alert('请先完成并通关【第一关·基础过关】，才能解锁第二关！');
+                return;
+            }
+            if(level === 3 && passStatus[2] !== 1){
+                alert('请先完成并通关【第二关·巩固提升】，才能解锁第三关！');
+                return;
+            }
+            currLevel = level;
+            const titleArr = ['','第一关·基础过关','第二关·巩固提升','第三关·拔高培优'];
+            document.getElementById('levelTitle').textContent = titleArr[level];
+            renderQuestions();
+            goPage('testPage');
+        }
+
+        // 渲染题目
+        function renderQuestions() {
+            const qs = questionLib[currLevel];
+            let html = '';
+            qs.forEach((item,idx)=>{
+                html += `<div class="question"><p>${item.q}</p>`;
+                if(item.type==="fill"){
+                    html += `<input type="text" class="input-ans" id="q${idx}" placeholder="请填写答案">`;
+                }else if(item.type==="judge"){
+                    html += `
+                        <div class="option"><label><input type="radio" name="q${idx}" value="√"> √ 正确</label></div>
+                        <div class="option"><label><input type="radio" name="q${idx}" value="×"> × 错误</label></div>
+                    `;
+                }else if(item.type==="choice"){
+                    item.opt.forEach(o=>{
+                        html += `<div class="option"><label><input type="radio" name="q${idx}" value="${o[0]}"> ${o}</label></div>`;
+                    });
+                }
+                html += `</div>`;
+            });
+            document.getElementById('testBox').innerHTML = html;
+        }
+
+        // 提交判分并保存
+        function submitAnswer() {
+            const qs = questionLib[currLevel];
+            let right = 0;
+            let errList = [];
+            qs.forEach((item,idx)=>{
+                let val = '';
+                if(item.type==="fill"){
+                    val = document.getElementById(`q${idx}`).value.trim();
+                }else{
+                    let r = document.querySelector(`input[name="q${idx}"]:checked`);
+                    val = r ? r.value : '';
+                }
+                if(val === item.ans) right++;
+                else errList.push(idx+1);
+            });
+            let pass = right >= 8;
+            if(pass) passStatus[currLevel] = 1;
+            levelScore[currLevel] = right;
+            levelWrong[currLevel] = errList;
+
+            saveUserProgress();
+            showResult(right,pass,errList);
+            updateLockUI();
+        }
+
+        // 弹窗结果
+        function showResult(correct,passed,wrongs) {
+            document.getElementById('scoreTxt').textContent = `答对 ${correct} 题 / 共10题`;
+            if(passed){
+                document.getElementById('passTxt').textContent = '✅ 恭喜通关，自动解锁下一关卡';
+                document.getElementById('nextBtn').classList.remove('hide');
+            }else{
+                document.getElementById('passTxt').textContent = '❌ 未达8题，请重新作答';
+                document.getElementById('nextBtn').classList.add('hide');
+            }
+            document.getElementById('errorTxt').textContent = wrongs.length>0 ? `错题：${wrongs.join('、')}` : '全部正确';
+            document.getElementById('singleAnalysisBtn').classList.remove('hide');
+            document.getElementById('resModal').style.display = 'flex';
+        }
+
+        // 跳转本关分析
+        function goSingleAnalysis(){
+            document.getElementById('resModal').style.display = 'none';
+            renderSingleAnalysis();
+            goPage('singleAnalysisPage');
+        }
+
+        // 渲染本关单独分析
+        function renderSingleAnalysis(){
+            let levelName = currLevel===1?"基础过关":currLevel===2?"巩固提升":"拔高培优";
+            let right = levelScore[currLevel];
+            let wrongArr = levelWrong[currLevel];
+            let isPass = right>=8 ? "已通关" : "未通关";
+            let wrongStr = wrongArr.length>0 ? wrongArr.join('、') : "无";
+            let rate = (right/10*100).toFixed(0);
+
+            let evalStr = "";
+            if(rate>=90) evalStr="本关知识点掌握优秀，基础扎实！";
+            else if(rate>=75) evalStr="本关掌握良好，少量知识点需要复盘。";
+            else if(rate>=60) evalStr="本关刚好合格，建议重做错题巩固。";
+            else evalStr="本关基础薄弱，请重新作答。";
+
+            let html = `
+                <div class="analysis-item"><strong>当前关卡：</strong>${levelName}</div>
+                <div class="analysis-item"><strong>答对题数：</strong>${right} / 10</div>
+                <div class="analysis-item"><strong>正确率：</strong>${rate}%</div>
+                <div class="analysis-item"><strong>通关状态：</strong>${isPass}</div>
+                <div class="analysis-item"><strong>错题题号：</strong>${wrongStr}</div>
+                <div class="eval-text"><strong>本关评价：</strong>${evalStr}</div>
+            `;
+            document.getElementById('singleAnalysisBox').innerHTML = html;
+        }
+
+        function backHome(){
+            document.getElementById('resModal').style.display = 'none';
+            goPage('homePage');
+        }
+        function nextStage(){
+            document.getElementById('resModal').style.display = 'none';
+            openLevel(currLevel+1);
+        }
+
+        // 保存用户数据
+        function saveUserProgress() {
+            let all = JSON.parse(localStorage.getItem('afangUserData')) || [];
+            let idx = all.findIndex(x=>x.name===userName);
+            let userData = {
+                name:userName,
+                pass:passStatus,
+                score:levelScore,
+                wrong:levelWrong
+            };
+            if(idx>-1) all[idx] = userData;
+            else all.push(userData);
+            localStorage.setItem('afangUserData',JSON.stringify(all));
+        }
+
+        // 个人综合分析
+        function renderAnalysis(){
+            if(!userName){
+                document.getElementById('analysisBox').innerHTML = 
+                    `<div class="analysis-item">请先输入姓名并进入系统，再查看答题分析！</div>`;
+                return;
+            }
+            let html = `<div class="analysis-item"><strong>学生姓名：</strong>${userName}</div>`;
+            let totalRight = 0;
+            let totalAll = 30;
+            for(let i=1;i<=3;i++){
+                let isPass = passStatus[i]===1 ? "已通关" : "未通关";
+                let wrongStr = levelWrong[i].length>0 ? levelWrong[i].join('、') : "无";
+                totalRight += levelScore[i];
+                html += `
+                <div class="analysis-item">
+                    <p><strong>第${i}关：</strong>${i===1?'基础过关':i===2?'巩固提升':'拔高培优'}</p>
+                    <p>答对题数：${levelScore[i]} / 10</p>
+                    <p>通关状态：${isPass}</p>
+                    <p>错题题号：${wrongStr}</p>
+                </div>
+                `;
+            }
+            let rate = (totalRight/totalAll*100).toFixed(1);
+            let evalStr = "";
+            if(rate>=90) evalStr = "整体掌握优秀，基础、文言、拓展知识点扎实，继续保持！";
+            else if(rate>=75) evalStr = "整体掌握良好，个别知识点有疏漏，建议复盘错题巩固。";
+            else if(rate>=60) evalStr = "整体合格，基础知识点不够牢固，需重新刷题背诵重点。";
+            else evalStr = "基础薄弱，需要重新学习课文文学常识、文言知识点，逐一过关。";
+
+            html += `
+            <div class="eval-text">
+                <p><strong>总体正确率：</strong>${rate}%</p>
+                <p><strong>学情评价：</strong>${evalStr}</p>
+            </div>
+            `;
+            document.getElementById('analysisBox').innerHTML = html;
+        }
+
+        // 班级统计、导出、重置
+        function showDataStatistics() {
+            let all = JSON.parse(localStorage.getItem('afangUserData')) || [];
+            if(!all.length){
+                document.getElementById('dataInfo').innerHTML = '暂无数据';
+                document.getElementById('dataTable').innerHTML = '';
+                return;
+            }
+            let total = all.length;
+            let p1 = all.filter(x=>x.pass[1]===1).length;
+            let p2 = all.filter(x=>x.pass[2]===1).length;
+            let p3 = all.filter(x=>x.pass[3]===1).length;
+            document.getElementById('dataInfo').innerHTML = `
+                总人数：${total} 人<br>
+                基础关通关：${p1} 人<br>
+                巩固关通关：${p2} 人<br>
+                培优关通关：${p3} 人
+            `;
+            let tab = `<tr><th>姓名</th><th>基础</th><th>巩固</th><th>培优</th></tr>`;
+            all.forEach(x=>{
+                let s1 = x.pass[1]===1?'已通关':'未通关';
+                let s2 = x.pass[2]===1?'已通关':'未通关';
+                let s3 = x.pass[3]===1?'已通关':'未通关';
+                tab += `<tr><td>${x.name}</td><td>${s1}</td><td>${s2}</td><td>${s3}</td></tr>`;
+            });
+            document.getElementById('dataTable').innerHTML = tab;
+        }
+
+        function exportTable() {
+            let all = JSON.parse(localStorage.getItem('afangUserData')) || [];
+            if(!all.length) return alert('暂无数据');
+            let csv = "姓名,基础过关,巩固提升,拔高培优\n";
+            all.forEach(x=>{
+                let s1 = x.pass[1]===1?'已通关':'未通关';
+                let s2 = x.pass[2]===1?'已通关':'未通关';
+                let s3 = x.pass[3]===1?'已通关':'未通关';
+                csv += `${x.name},${s1},${s2},${s3}\n`;
+            });
+            let blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url; a.download = "阿房宫赋闯关成绩.csv"; a.click();
+        }
+
+        function clearAllData() {
+            if(confirm('确定清空所有学生通关数据？不可恢复！')){
+                localStorage.removeItem('afangUserData');
+                alert('已重置所有数据');
+                showDataStatistics();
+                updateLockUI();
+            }
+        }
+
+        window.onload = function(){}
+    </script>
+</body>
+</html>
